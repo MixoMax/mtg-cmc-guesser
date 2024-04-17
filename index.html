@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTG cmc guesser</title>
+</head>
+<body>
+    <script>
+        var global_obj = {}
+        function get_random_card() {
+            fetch("/random_card")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("type").innerText = data.type;
+                    document.getElementById("text").innerText = data.text;
+                    document.getElementById("power").innerText = data.power;
+                    document.getElementById("toughness").innerText = data.toughness;
+                    document.getElementById("loyalty").innerText = data.loyalty;
+                    global_obj = data.cmc; // correct cmc
+                });
+        }
+
+        function submit() {
+            var guess = document.getElementById("guess").value;
+            var name = document.getElementById("name").value;
+
+            fetch("/guess?user_name=" + name + "&cmc_correct=" + global_obj + "&cmc_guess=" + guess)
+                .then(response => response.json())
+                .then(data => {
+                    let correct_cmc = data.cmc_correct;
+                    let guess_cmc = data.cmc_guess;
+                    document.getElementById("correct_cmc").innerText = "Correct cmc: " + correct_cmc;
+                    document.getElementById("guess_cmc").innerText = "Your guess: " + guess_cmc;
+                    get_random_card();
+                });
+        }
+
+        get_random_card();
+            
+            
+    </script>
+    <h1>MTG cmc guesser</h1>
+    <input type="text" id="name">
+    <p>Guess the converted mana cost of the card</p>
+    <p>type: <span id="type"></span></p>
+    <p>text: <span id="text"></span></p>
+    <p>power: <span id="power"></span></p>
+    <p>toughness: <span id="toughness"></span></p>
+    <p>loyalty: <span id="loyalty"></span></p>
+
+    <input type="number" id="guess" min="0" max="20">
+    <button onclick="submit()">Submit</button>
+
+    <span id="correct_cmc"></span>
+    <span id="guess_cmc"></span>
+</body>
+</html>
