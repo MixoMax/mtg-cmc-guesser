@@ -4,12 +4,15 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import MTG_Card from './components/Mtg_Card';
+import Leaderboard from './components/Leaderboard';
 
 function App() {
   const [card_obj, setCardObj] = useState({});
   const [user_name, setUserName] = useState('');
   const [cmc_guess, setCmcGuess] = useState(0);
-  const [show_correct, setShowCorrect] = useState(-1);
+  const [last_correct_cmc, setLastCorrectCmc] = useState(0);
+  const [last_guess_cmc, setLastGuessCmc] = useState(0);
+  const [leaderboard_data, setLeaderboardData] = useState([]);
 
   useEffect(() => {
     get_random_card();
@@ -31,7 +34,8 @@ function App() {
       .then(data => {
         console.log(data);
       });
-    setShowCorrect(card_obj.cmc);
+    setLastGuessCmc(cmc_guess);
+    setLastCorrectCmc(card_obj.cmc);
   }
 
   function make_guess_and_get_new_card() {
@@ -40,6 +44,15 @@ function App() {
     // clear the guess input
     setCmcGuess(0);
     document.getElementById("cmc-guess").value = "";
+  }
+
+  function get_leaderboard() {
+    var url = "/leaderboard";
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        setLeaderboardData(data);
+      });
   }
 
   return (
@@ -62,11 +75,15 @@ function App() {
       <br />
 
       <div>
-        <p>Guessed: {cmc_guess}</p>
-        <p>Correct: {show_correct}</p>
+        <p>Guessed: {last_guess_cmc}</p>
+        <p>Correct: {last_correct_cmc}</p>
       </div>
 
-      
+      <br />
+
+      <button onClick={get_leaderboard}>Get Leaderboard</button>
+
+      <Leaderboard leaderboard_data={leaderboard_data} />
 
     </div>
   );

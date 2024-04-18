@@ -13,7 +13,8 @@ cmds = [
 ]
 
 for cmd in cmds:
-    os.system(cmd)
+    #os.system(cmd)
+    pass
 
 app = FastAPI()
 
@@ -80,7 +81,32 @@ def get_leaderboard():
     
     sorted_users = sorted(user_dict.items(), key=lambda x: x[1], reverse=True)
 
-    return {"leaderboard": sorted_users}
+    out_json = []
+
+    out_json.append(
+        {
+            "user_name": "user_name",
+            "score": "score",
+            "total_guesses": "out of",
+            "avg_off_by": "avg off by"
+        }
+    )
+
+    for user_name, score in sorted_users:
+        out_json.append(
+            {
+                "user_name": user_name,
+                "score": score,
+                "total_guesses": len([x for x in guesses if x[0] == user_name]),
+                "avg_off_by": sum([abs(x[1] - x[2]) for x in guesses if x[0] == user_name]) / len([x for x in guesses if x[0] == user_name])
+            }
+        )
+
+    return JSONResponse(content=out_json)
+
+@app.get("/")
+def root():
+    return FileResponse("./frontend/build/index.html")
 
 @app.get("/{path}")
 def serve_frontend(path):
