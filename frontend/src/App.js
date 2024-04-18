@@ -16,7 +16,7 @@ function App() {
   }, []);
 
   function get_random_card() {
-    var url = "http://localhost/random_card";
+    var url = "/random_card";
     fetch(url)
       .then(response => response.json())
       .then(data => {
@@ -25,7 +25,7 @@ function App() {
   }
 
   function make_guess() {
-    var url = "http://localhost/guess?user_name=" + user_name + "&cmc_correct=" + card_obj.cmc + "&cmc_guess=" + cmc_guess;
+    var url = "/guess?user_name=" + user_name + "&cmc_correct=" + card_obj.cmc + "&cmc_guess=" + cmc_guess;
     fetch(url)
       .then(response => response.json())
       .then(data => {
