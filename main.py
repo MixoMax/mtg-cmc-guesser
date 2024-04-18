@@ -6,6 +6,7 @@ import json
 import random
 import sqlite3
 import os
+import hashlib
 
 cmds = [
     "git fetch && git stash && git pull",
@@ -103,6 +104,16 @@ def get_leaderboard():
         )
 
     return JSONResponse(content=out_json)
+
+@app.get("/reset")
+def reset(p: str):
+    p_hash = hashlib.sha256(p.encode()).hexdigest()
+    if p_hash == "61f4ad676abcc0fe6c583e5f7923dfbb24cdbd8cae7c8459e6d26574dff7735b":
+        c.execute("DELETE FROM guesses")
+        conn.commit()
+        return JSONResponse(content={"status": "success"})
+    else:
+        return JSONResponse(content={"status": "failure"}, status_code=403)
 
 @app.get("/")
 def root():
