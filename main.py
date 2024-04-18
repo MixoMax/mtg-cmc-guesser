@@ -11,7 +11,7 @@ cmds = [
     "git fetch --all",
     "git reset --hard origin/master",
     "git pull origin master"
-    "cd ./frontend",
+    "cd frontend",
     "npm run build",
     "cd .."
 ]
