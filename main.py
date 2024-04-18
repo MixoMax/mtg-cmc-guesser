@@ -8,12 +8,8 @@ import sqlite3
 import os
 
 cmds = [
-    "git fetch --all",
-    "git reset --hard origin/master",
-    "git pull origin master"
-    "cd frontend",
-    "npm run build",
-    "cd .."
+    "git fetch && git stash && git pull",
+    "cd frontend && npm run build && cd .."
 ]
 
 for cmd in cmds:
