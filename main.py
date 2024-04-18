@@ -1,11 +1,41 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import json
 import random
 import sqlite3
+import os
+
+cmds = [
+    "git fetch --all",
+    "git reset --hard origin/master",
+    "git pull origin master"
+    "cd ./frontend",
+    "npm run build",
+    "cd .."
+]
+
+for cmd in cmds:
+    os.system(cmd)
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "http://localhost:5000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
 
 conn = sqlite3.connect("guesses.db", check_same_thread=False)
 c = conn.cursor()
@@ -14,9 +44,6 @@ c.execute("CREATE TABLE IF NOT EXISTS guesses (user_name text, cmc_correct int, 
 with open("./ambigous_cards.json", "r") as f:
     cards = json.load(f)
 
-@app.get("/")
-def read_root():
-    return FileResponse("index.html")
 
 @app.get("/random_card")
 def random_card():
@@ -44,5 +71,40 @@ def get_guesses(user_name: str):
 
     return {"guesses": guesses}
 
+@app.get("/leaderboard")
+def get_leaderboard():
+    user_dict = {}
+    c.execute("SELECT * FROM guesses")
+    guesses = c.fetchall()
+
+    for guess in guesses:
+        name, correct, guess = guess
+        is_correct = (correct == guess)
+        user_dict[name] = user_dict.get(name, 0) + is_correct
+    
+    sorted_users = sorted(user_dict.items(), key=lambda x: x[1], reverse=True)
+
+    return {"leaderboard": sorted_users}
+
+@app.get("/{path}")
+def serve_frontend(path):
+    if path == "":
+        path = "index.html"
+    fp = f"./frontend/build/{path}"
+    print(fp)
+    if os.path.exists(fp):
+        return FileResponse(fp)
+    else:
+        return JSONResponse(content={"error": "Resource not found"}, status_code=404)
+
+@app.get("/static/{path}/{file}")
+def serve_static(path, file):
+    fp = f"./frontend/build/static/{path}/{file}"
+    if os.path.exists(fp):
+        return FileResponse(fp)
+    else:
+        return JSONResponse(content={"error": "Resource not found"}, status_code=404)
+
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=80)

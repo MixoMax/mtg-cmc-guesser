@@ -1,0 +1,28 @@
+.card-container {
+    width: 660px;
+    height: 880px;
+    background-image: url("./background.jpg");
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.card-container > * {
+    text-align: left;
+    font-size: 24px;
+}
+
+#card-type {
+    transform: translate(50px, 505px);
+}
+
+#card-text {
+    max-width: 70%;
+    transform: translate(50px, 225px);
+}
+
+#card-power-toughness-loyalty {
+    transform: translate(calc(100% - 100px), -25px);
+}
