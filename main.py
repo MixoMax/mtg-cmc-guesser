@@ -116,13 +116,13 @@ def reset(p: str):
 
 @app.get("/")
 def root():
-    return FileResponse("./frontend/public/index.html")
+    return FileResponse("./frontend/build/index.html")
 
 @app.get("/{path}")
 def serve_frontend(path):
     if path == "":
         path = "index.html"
-    fp = f"./frontend/public/{path}"
+    fp = f"./frontend/build/{path}"
     print(fp)
     if os.path.exists(fp):
         return FileResponse(fp)
@@ -131,7 +131,7 @@ def serve_frontend(path):
 
 @app.get("/static/{path}/{file}")
 def serve_static(path, file):
-    fp = f"./frontend/public/static/{path}/{file}"
+    fp = f"./frontend/build/static/{path}/{file}"
     if os.path.exists(fp):
         return FileResponse(fp)
     else:
